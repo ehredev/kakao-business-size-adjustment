@@ -69,6 +69,10 @@ function addResizeHandle() {
         document.body.style.cursor = '';
         document.body.style.userSelect = '';
         resizeHandle.classList.remove('dragging');
+
+        // 크기를 localStorage에 저장
+        const currentHeight = chatInput.offsetHeight;
+        localStorage.setItem('kakao-chat-height', currentHeight);
       }
     });
 
@@ -79,7 +83,20 @@ function addResizeHandle() {
       if (textarea) {
         textarea.style.height = '40px';
       }
+      // localStorage에서 저장된 높이 제거
+      localStorage.removeItem('kakao-chat-height');
     });
+
+    // 저장된 크기 복원
+    const savedHeight = localStorage.getItem('kakao-chat-height');
+    if (savedHeight) {
+      chatInput.style.height = savedHeight + 'px';
+      const textarea = chatInput.querySelector('.box_tf');
+      if (textarea) {
+        const textareaHeight = Math.max(40, parseInt(savedHeight) - 70);
+        textarea.style.height = textareaHeight + 'px';
+      }
+    }
   });
 }
 
@@ -95,25 +112,3 @@ observer.observe(document.body, {
   childList: true,
   subtree: true
 });
-
-// 저장된 크기 복원 (선택사항)
-function saveSize(height) {
-  localStorage.setItem('kakao-chat-height', height);
-}
-
-function loadSize() {
-  const savedHeight = localStorage.getItem('kakao-chat-height');
-  if (savedHeight) {
-    const chatInputs = document.querySelectorAll('.write_chat3');
-    chatInputs.forEach((chatInput) => {
-      chatInput.style.height = savedHeight + 'px';
-      const textarea = chatInput.querySelector('.box_tf');
-      if (textarea) {
-        textarea.style.height = (parseInt(savedHeight) - 20) + 'px';
-      }
-    });
-  }
-}
-
-// 페이지 로드 시 저장된 크기 복원
-setTimeout(loadSize, 500);
