@@ -71,8 +71,11 @@
 
 /* write_menu와 btn_submit는 항상 하단에 고정 */
 .write_chat3 .write_menu {
+  position: absolute;
+  bottom: 10px;
   flex-shrink: 0;
   background-color: white;
+  margin-top: auto;
 }
 
 .write_chat3 .btn_submit {
