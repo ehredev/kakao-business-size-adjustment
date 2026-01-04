@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "카카오 비즈니스 유틸리티",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "카카오톡 비즈니스에 유용한 기능을 제공합니다.",
   "permissions": [
     "storage"
