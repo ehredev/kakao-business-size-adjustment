@@ -35,7 +35,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "kakao-business-utility@ehre.dev",
+      "id": "kakao-business-chat-resize@ehre.dev",
       "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": ["none"]
