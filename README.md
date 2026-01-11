@@ -56,7 +56,7 @@
 ## 파일 구조
 
 ```
-kakao-business-size-adjustment/
+kakao-business-utility/
 ├── manifest.json          # 확장 프로그램 설정 파일 (Manifest V3)
 ├── content.js             # 메인 기능 구현 (리사이즈, 채팅 로그)
 ├── content.css            # 스타일 정의
@@ -86,7 +86,7 @@ kakao-business-size-adjustment/
 ## 개발자 정보
 
 - **Extension ID**: `kakao-business-utility@ehre.dev`
-- **Version**: 1.0.0
+- **Version**: 1.1.0
 - **Permissions**: `storage`
 
 ## 라이선스
