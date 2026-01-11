@@ -1,5 +1,15 @@
 // 카카오 비즈니스 채팅창 크기 조절 스크립트
 
+// 대화내역 영역(room) 높이 조절 함수
+function updateChatRoomHeight(chatInputHeight) {
+  const room = document.getElementById('room');
+  if (room) {
+    // 전체 높이에서 채팅 입력창 높이를 뺀 값으로 대화 영역 높이 조정
+    const newRoomHeight = `calc(100% - ${chatInputHeight}px + 120px)`;
+    room.style.height = newRoomHeight;
+  }
+}
+
 function addResizeHandle() {
   const chatInputs = document.querySelectorAll('.write_chat3');
 
@@ -13,14 +23,6 @@ function addResizeHandle() {
     const resizeHandle = document.createElement('div');
     resizeHandle.className = 'resize-handle';
     resizeHandle.innerHTML = '<span class="resize-icon">⋮⋮</span>';
-
-    // chatInput에 절대 위치 설정 (하단 고정)
-    chatInput.style.position = 'fixed';
-    chatInput.style.bottom = '0';
-    chatInput.style.left = '0';
-    chatInput.style.right = '0';
-    chatInput.style.zIndex = '1000';
-    chatInput.style.minHeight = '60px';
 
     // resize handle을 맨 앞에 추가 (상단에 위치하도록)
     chatInput.insertBefore(resizeHandle, chatInput.firstChild);
@@ -60,6 +62,9 @@ function addResizeHandle() {
           const textareaHeight = Math.max(40, newHeight - 70);
           textarea.style.height = textareaHeight + 'px';
         }
+
+        // 대화내역 영역(room) 높이 조절
+        updateChatRoomHeight(newHeight);
       }
     });
 
@@ -78,24 +83,33 @@ function addResizeHandle() {
 
     // 더블클릭으로 기본 크기로 되돌리기
     resizeHandle.addEventListener('dblclick', () => {
-      chatInput.style.height = 'auto';
+      chatInput.style.height = '';
       const textarea = chatInput.querySelector('.box_tf');
       if (textarea) {
         textarea.style.height = '40px';
       }
       // localStorage에서 저장된 높이 제거
       localStorage.removeItem('kakao-chat-height');
+
+      // 대화내역 영역도 기본값으로 복원
+      const room = document.getElementById('room');
+      if (room) {
+        room.style.height = '100%';
+      }
     });
 
     // 저장된 크기 복원
     const savedHeight = localStorage.getItem('kakao-chat-height');
     if (savedHeight) {
-      chatInput.style.height = savedHeight + 'px';
+      const height = parseInt(savedHeight);
+      chatInput.style.height = height + 'px';
       const textarea = chatInput.querySelector('.box_tf');
       if (textarea) {
-        const textareaHeight = Math.max(40, parseInt(savedHeight) - 70);
+        const textareaHeight = Math.max(40, height - 70);
         textarea.style.height = textareaHeight + 'px';
       }
+      // 대화내역 영역도 복원
+      updateChatRoomHeight(height);
     }
   });
 }
