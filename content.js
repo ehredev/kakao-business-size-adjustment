@@ -307,8 +307,11 @@ function addHoverFetchListeners() {
         const chatId = input.id.replace('chat-select-', '');
         if (!chatId) return;
 
+        // URL에서 프로필 ID 파싱
+        const profileId = window.location.pathname.split('/')[1];
+
         // fetch 실행
-        fetch(`https://business.kakao.com/api/profiles/_xkXFPs/chats/${chatId}/chatlogs`, {
+        fetch(`https://business.kakao.com/api/profiles/${profileId}/chats/${chatId}/chatlogs`, {
           credentials: "include"
         })
           .then(response => response.json())
