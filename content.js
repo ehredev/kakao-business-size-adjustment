@@ -1,12 +1,27 @@
 // 카카오 비즈니스 채팅창 크기 조절 스크립트
 
 // 대화내역 영역(room) 높이 조절 함수
-function updateChatRoomHeight(chatInputHeight) {
+// 새 레이아웃에서는 .dropzone이 auto-height라 calc(100% - X) 방식이
+// 먹히지 않고, .write_chat3가 absolute로 room 위에 겹쳐 가려진다.
+// 따라서 room의 top과 write_chat3의 top 사이 거리를 픽셀로 직접 지정한다.
+// write_chat3는 absolute이므로 room 높이가 바뀌어도 자기 위치가 흔들리지
+// 않아 순환 참조가 생기지 않는다.
+function updateChatRoomHeight() {
   const room = document.getElementById('room');
-  if (room) {
-    // 전체 높이에서 채팅 입력창 높이를 뺀 값으로 대화 영역 높이 조정
-    const newRoomHeight = `calc(100% - ${chatInputHeight}px + 120px)`;
-    room.style.height = newRoomHeight;
+  const writeChat = document.querySelector('.write_chat3');
+  if (!room || !writeChat) return;
+
+  const roomTop = room.getBoundingClientRect().top;
+  const writeTop = writeChat.getBoundingClientRect().top;
+  const h = writeTop - roomTop;
+  if (h > 0) {
+    // 부모 .dropzone이 display:flex; flex-direction:column 이고
+    // #room은 flex:1 1 0% 이라 그냥 height를 세팅하면 flex 규칙에 밀린다.
+    // flex-basis를 고정 px로 잠가야 실제 크기가 적용된다.
+    room.style.setProperty('flex', `0 0 ${h}px`, 'important');
+    room.style.setProperty('height', h + 'px', 'important');
+    room.style.setProperty('max-height', h + 'px', 'important');
+    room.style.setProperty('min-height', '0', 'important');
   }
 }
 
@@ -53,6 +68,12 @@ function addResizeHandle() {
 
       // 최소/최대 높이 제한
       if (newHeight >= 60 && newHeight <= 800) {
+        // room이 줄거나 늘어나도 사용자가 보던 마지막 메시지가 계속 보이도록
+        // 하단을 기준으로 scrollTop을 보정한다.
+        const room = document.getElementById('room');
+        const prevRoomHeight = room ? room.offsetHeight : 0;
+        const prevScrollTop = room ? room.scrollTop : 0;
+
         chatInput.style.height = newHeight + 'px';
 
         // textarea 높이만 조절 (메뉴는 그대로 유지)
@@ -64,7 +85,15 @@ function addResizeHandle() {
         }
 
         // 대화내역 영역(room) 높이 조절
-        updateChatRoomHeight(newHeight);
+        updateChatRoomHeight();
+
+        if (room) {
+          const newRoomHeight = room.offsetHeight;
+          const delta = prevRoomHeight - newRoomHeight;
+          if (delta !== 0) {
+            room.scrollTop = prevScrollTop + delta;
+          }
+        }
       }
     });
 
@@ -91,11 +120,8 @@ function addResizeHandle() {
       // localStorage에서 저장된 높이 제거
       localStorage.removeItem('kakao-chat-height');
 
-      // 대화내역 영역도 기본값으로 복원
-      const room = document.getElementById('room');
-      if (room) {
-        room.style.height = '100%';
-      }
+      // 대화내역 영역도 chat_foot 기준으로 재계산
+      updateChatRoomHeight();
     });
 
     // 저장된 크기 복원
@@ -109,7 +135,7 @@ function addResizeHandle() {
         textarea.style.height = textareaHeight + 'px';
       }
       // 대화내역 영역도 복원
-      updateChatRoomHeight(height);
+      updateChatRoomHeight();
     }
   });
 }
